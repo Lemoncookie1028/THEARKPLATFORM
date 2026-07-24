@@ -1,75 +1,95 @@
-// Auth state management
-let currentUser = null;
-let authListeners = [];
+// Auth functions
+const API_URL = '/api';
 
-function onAuthStateChanged(callback) {
-  authListeners.push(callback);
-}
-
-// Sign up with email and password
+// Sign up
 async function signUp(email, password, displayName) {
   try {
-    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    const user = userCredential.user;
+    const response = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password, displayName })
+    });
+
+    const data = await response.json();
     
-    // Update profile with display name
-    if (displayName) {
-      await user.updateProfile({ displayName });
+    if (!response.ok) {
+      throw new Error(data.error || 'Sign up failed');
     }
+
+    // Store token and user data
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
     
     showToast('Account created successfully!');
-    return user;
+    return data;
   } catch (error) {
-    console.error('Sign up error:', error);
-    showToast('Sign up failed: ' + error.message);
+    showToast(error.message);
     throw error;
   }
 }
 
-// Sign in with email and password
+// Sign in
 async function signIn(email, password) {
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    showToast('Welcome back!');
-    return userCredential.user;
-  } catch (error) {
-    console.error('Sign in error:', error);
-    showToast('Sign in failed: ' + error.message);
-    throw error;
-  }
-}
+    const response = await fetch(`${API_URL}/auth/signin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-// Sign out
-async function signOut() {
-  try {
-    await auth.signOut();
-    showToast('Signed out successfully');
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Sign in failed');
+    }
+
+    // Store token and user data
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    showToast('Welcome back!');
+    return data;
   } catch (error) {
-    console.error('Sign out error:', error);
-    showToast('Sign out failed: ' + error.message);
+    showToast(error.message);
+    throw error;
   }
 }
 
 // Reset password
 async function resetPassword(email) {
   try {
-    await auth.sendPasswordResetEmail(email);
-    showToast('Password reset email sent to ' + email);
+    const response = await fetch(`${API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Reset failed');
+    }
+
+    showToast('Password reset email sent');
+    return data;
   } catch (error) {
-    console.error('Password reset error:', error);
-    showToast('Reset failed: ' + error.message);
+    showToast(error.message);
+    throw error;
   }
 }
 
-// Auth UI handlers
+// Setup auth UI
 function setupAuthUI() {
-  const authContainer = document.getElementById('authContainer');
-  const appContainer = document.getElementById('appContainer');
   const authForm = document.getElementById('authForm');
   const authSubmit = document.getElementById('authSubmit');
   const authToggle = document.getElementById('authToggle');
   const resetPasswordLink = document.getElementById('resetPasswordLink');
-  const signOutBtn = document.getElementById('signOutBtn');
   
   let currentMode = 'signin';
   
@@ -111,8 +131,10 @@ function setupAuthUI() {
         return;
       }
       await signUp(email, password, displayName);
+      window.location.reload();
     } else {
       await signIn(email, password);
+      window.location.reload();
     }
   });
   
@@ -125,27 +147,4 @@ function setupAuthUI() {
     }
     await resetPassword(email);
   });
-  
-  // Sign out
-  signOutBtn.addEventListener('click', async () => {
-    await signOut();
-  });
 }
-
-// Auth state observer
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  
-  const authContainer = document.getElementById('authContainer');
-  const appContainer = document.getElementById('appContainer');
-  
-  if (user) {
-    authContainer.style.display = 'none';
-    appContainer.style.display = 'block';
-    // Notify listeners
-    authListeners.forEach(callback => callback(user));
-  } else {
-    authContainer.style.display = 'flex';
-    appContainer.style.display = 'none';
-  }
-});
