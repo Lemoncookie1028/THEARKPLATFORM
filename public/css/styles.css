@@ -405,22 +405,27 @@ body {
 }
 
 .bottom-nav {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
 
-    height: 70px;
-    background: #14171a;
-    border-top: 1px solid #2a2f35;
+  width: 100%;
+  max-width: inherit;
+  height: 70px;
 
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+  background: #14171a;
+  border-top: 1px solid #2a2f35;
 
-    z-index: 1000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 
-    padding-bottom: env(safe-area-inset-bottom);
+  z-index: 9999;
+
+  padding-bottom: env(safe-area-inset-bottom);
+
+  backdrop-filter: blur(12px);
 }
 
 .bottom-nav button,
