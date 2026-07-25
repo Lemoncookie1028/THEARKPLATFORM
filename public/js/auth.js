@@ -1,5 +1,8 @@
 // Auth functions
-const API_URL = '/api';
+// API_URL comes from config.js, loaded earlier — do not redeclare it here.
+// (Redeclaring a top-level const across <script> tags throws a SyntaxError
+// that silently kills the whole file — this was the bug that made every
+// button on the page unresponsive.)
 
 // Sign up
 async function signUp(email, password, displayName) {

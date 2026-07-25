@@ -8,10 +8,10 @@ const firebaseConfig = {
   appId: "1:1436735808:web:ee7116aaabb7a8970902a5"
 };
 
-// API URL - change to your Vercel URL when deployed
-const API_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3000/api' 
-  : 'https://thearkplatform.vercel.app/api';
+// API URL — relative path works on any deployment (production, preview,
+// custom domain, or local `vercel dev`) since the API always lives on the
+// same origin as the page.
+const API_URL = '/api';
 
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {

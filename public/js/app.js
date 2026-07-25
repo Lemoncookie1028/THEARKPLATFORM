@@ -1,5 +1,5 @@
 // Main app initialization
-const API_URL = '/api';
+// API_URL comes from config.js, loaded earlier — do not redeclare it here.
 
 // Check if user is authenticated
 async function checkAuth() {
