@@ -1,43 +1,87 @@
-// Validation functions
-function validateEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-}
+const { admin, db, auth } = require('../_lib/firebase');
+const { validateEmail, validatePassword, validateDisplayName } = require('../_lib/validation');
+const { generateToken } = require('../_lib/auth');
 
-function validatePassword(password) {
-  // Minimum 8 characters, at least one letter and one number
-  return password.length >= 8 && /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
-}
-
-function validateDisplayName(name) {
-  return name && name.length >= 2 && name.length <= 50;
-}
-
-function validatePost(data) {
-  const { type, headline, content } = data;
-  if (!type || !['clip', 'card', 'article', 'news'].includes(type)) {
-    return { valid: false, error: 'Invalid post type' };
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-  if (!headline || headline.length < 3) {
-    return { valid: false, error: 'Headline must be at least 3 characters' };
-  }
-  if (type === 'article' && (!content || content.length < 10)) {
-    return { valid: false, error: 'Article content must be at least 10 characters' };
-  }
-  return { valid: true };
-}
 
-function sanitizeInput(input) {
-  if (typeof input !== 'string') return input;
-  return input
-    .replace(/[<>]/g, '') // Remove HTML tags
-    .trim();
-}
+  const { email, password, displayName } = req.body;
 
-module.exports = {
-  validateEmail,
-  validatePassword,
-  validateDisplayName,
-  validatePost,
-  sanitizeInput
+  // Validation
+  if (!email || !password || !displayName) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  if (!validatePassword(password)) {
+    return res.status(400).json({ 
+      error: 'Password must be at least 8 characters with letters and numbers' 
+    });
+  }
+
+  if (!validateDisplayName(displayName)) {
+    return res.status(400).json({ error: 'Display name must be 2-50 characters' });
+  }
+
+  try {
+    // Create user in Firebase Auth
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName,
+      emailVerified: false
+    });
+
+    // Create user document in Firestore
+    await db.collection('users').doc(userRecord.uid).set({
+      id: userRecord.uid,
+      email: email,
+      displayName: displayName,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      isAdmin: false,
+      isVerifier: false,
+      reputation: 0,
+      savedPosts: [],
+      followersCount: 0
+    });
+
+    // Create creator profile
+    await db.collection('creators').doc(userRecord.uid).set({
+      id: userRecord.uid,
+      name: displayName,
+      initials: displayName.substring(0, 2).toUpperCase(),
+      handle: '@' + displayName.toLowerCase().replace(/\s/g, ''),
+      role: 'creator',
+      bio: 'Passionate about sharing knowledge',
+      followers: 0,
+      isVerified: false,
+      isVerifier: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Generate JWT token
+    const token = generateToken(userRecord.uid, email);
+
+    res.status(201).json({
+      success: true,
+      user: {
+        id: userRecord.uid,
+        email: userRecord.email,
+        displayName: userRecord.displayName
+      },
+      token
+    });
+
+  } catch (error) {
+    console.error('Signup error:', error);
+    if (error.code === 'auth/email-already-exists') {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+    res.status(500).json({ error: 'Failed to create account: ' + error.message });
+  }
 };

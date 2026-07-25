@@ -21,9 +21,10 @@ module.exports = async (req, res) => {
     // Get user by email
     const userRecord = await auth.getUserByEmail(email);
 
-    // Note: Firebase Admin SDK doesn't support email/password sign-in
-    // In production, you'd use Firebase Client SDK or custom auth
-    // For simplicity, we'll generate a token for the user
+    // Note: In production, you should verify the password
+    // This is a simplified version - consider using Firebase Client SDK
+    
+    // Generate JWT token
     const token = generateToken(userRecord.uid, email);
 
     res.status(200).json({
@@ -41,6 +42,6 @@ module.exports = async (req, res) => {
     if (error.code === 'auth/user-not-found') {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    res.status(500).json({ error: 'Failed to sign in' });
+    res.status(500).json({ error: 'Failed to sign in: ' + error.message });
   }
 };
