@@ -1,4 +1,4 @@
-const { admin, db } = require('../_lib/firebase');
+const { admin, db, auth } = require('../_lib/firebase');
 const { authenticate } = require('../_lib/auth');
 const { validatePost, sanitizeInput } = require('../_lib/validation');
 
@@ -11,6 +11,17 @@ module.exports = async (req, res) => {
   await authenticate(req, res, async () => {
     const { type, headline, content, videoUrl, duration, slides, sourceName, sourceUrl, snippet, topicId, sources } = req.body;
     const userId = req.userId;
+
+    // Require a verified email before allowing posting — the frontend
+    // banner is just a nudge, this is what actually stops it.
+    try {
+      const userRecord = await auth.getUser(userId);
+      if (!userRecord.emailVerified) {
+        return res.status(403).json({ error: 'Please verify your email before posting' });
+      }
+    } catch (err) {
+      return res.status(401).json({ error: 'Could not verify account status' });
+    }
 
     // Validate post
     const validation = validatePost({ type, headline, content });

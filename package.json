@@ -16,7 +16,8 @@
     "dotenv": "^16.3.1",
     "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "vercel": "^33.0.0"

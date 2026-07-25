@@ -15,7 +15,11 @@ function stampsFor(post) {
   const stamps = [];
   if (post.flag) stamps.push(`<span class="stamp ${post.flag.level}">${post.flag.label}</span>`);
   if (post.verifierReviewed) stamps.push('<span class="stamp teal">verifier reviewed</span>');
-  if (post.creatorName) stamps.push(`<span class="stamp">by ${post.creatorName}</span>`);
+  if (post.creatorName && post.creatorId) {
+    stamps.push(`<span class="stamp creator-stamp" data-creator-id="${post.creatorId}">by ${post.creatorName}</span>`);
+  } else if (post.creatorName) {
+    stamps.push(`<span class="stamp">by ${post.creatorName}</span>`);
+  }
   return stamps.length ? `<div class="stamp-group">${stamps.join('')}</div>` : '';
 }
 
@@ -68,7 +72,15 @@ function buildCardEl(post) {
   el.className = 'card';
   el.dataset.postId = post.id;
   el.innerHTML = `<div class="card-body">${renderPost(post)}</div>`;
-  el.addEventListener('click', () => openSourcePanel(post));
+  el.addEventListener('click', (e) => {
+    const stamp = e.target.closest('.creator-stamp');
+    if (stamp) {
+      e.stopPropagation();
+      openProfile(stamp.dataset.creatorId);
+      return;
+    }
+    openSourcePanel(post);
+  });
   return el;
 }
 
@@ -161,19 +173,13 @@ function setupFeedUI() {
 
       const tab = icon.dataset.tab;
       if (tab === 'home') initFeed('for-you');
+      else if (tab === 'profile') {
+        if (!currentUser) { showToast('Please sign in first'); return; }
+        openProfile(currentUser.id);
+      }
       else showToast(`${tab[0].toUpperCase()}${tab.slice(1)} isn't built yet`);
     });
   }
 
-  const profileBtn = document.getElementById('profileBtn');
-  if (profileBtn) {
-    profileBtn.addEventListener('click', async () => {
-      if (!currentUser) {
-        showToast('Please sign in first');
-        return;
-      }
-      const profile = await loadUserProfile(currentUser.id);
-      showToast(profile ? `Signed in as ${profile.displayName}` : 'Could not load profile');
-    });
-  }
+  setupProfileUI();
 }

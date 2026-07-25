@@ -66,6 +66,14 @@
       </div>
     </header>
 
+    <div class="verify-banner" id="verifyBanner" style="display:none;">
+      <span>Verify your email to unlock posting.</span>
+      <div class="verify-banner-actions">
+        <button id="resendVerifyBtn" type="button">Resend</button>
+        <button id="refreshVerifyBtn" type="button">I've verified</button>
+      </div>
+    </div>
+
     <nav class="topic-tabs" id="tabContainer">
       <span class="tab active" data-tab="for-you">FOR YOU</span>
       <span class="tab" data-tab="monetary">MONETARY POLICY</span>
@@ -102,6 +110,41 @@
       <h4>SOURCES ATTACHED</h4>
       <div id="sourceList"></div>
       <div class="close-panel" id="closePanel">✕ close sources</div>
+    </div>
+
+    <div class="source-panel profile-panel" id="profilePanel">
+      <div class="handle"></div>
+
+      <div id="profileView">
+        <div class="profile-header">
+          <div class="profile-avatar" id="profileAvatar">--</div>
+          <div>
+            <div class="profile-name" id="profileName">—</div>
+            <div class="profile-handle" id="profileHandle">—</div>
+          </div>
+        </div>
+        <p class="profile-bio" id="profileBio"></p>
+        <div class="profile-stats">
+          <div><span id="profileFollowers">0</span><label>followers</label></div>
+          <div><span id="profileRole">creator</span><label>role</label></div>
+        </div>
+        <button class="auth-btn profile-follow-btn" id="profileFollowBtn" style="display:none;">Follow</button>
+        <button class="auth-btn profile-edit-btn" id="profileEditBtn" style="display:none;">Edit Profile</button>
+      </div>
+
+      <form id="profileEditForm" style="display:none;">
+        <div class="form-group">
+          <label for="editDisplayName">Display Name</label>
+          <input type="text" id="editDisplayName" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label for="editBio">Bio</label>
+          <input type="text" id="editBio" placeholder="A short bio">
+        </div>
+        <button type="submit" id="profileSaveBtn">Save Changes</button>
+      </form>
+
+      <div class="close-panel" id="closeProfilePanel">✕ close profile</div>
     </div>
 
     <div class="toast" id="toast"></div>
