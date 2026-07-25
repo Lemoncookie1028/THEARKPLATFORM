@@ -1,4 +1,8 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
   background: #0b0d0f;
@@ -7,11 +11,14 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px;
+  align-items: flex-start;
+  padding: 0;
 }
 
-/* Auth Styles */
+/* =========================
+   AUTH
+========================= */
+
 #authContainer {
   width: 100%;
   max-width: 400px;
@@ -19,6 +26,7 @@ body {
   border: 1px solid #2a2f35;
   border-radius: 20px;
   padding: 40px;
+  margin: auto;
 }
 
 .auth-modal h1 {
@@ -53,7 +61,7 @@ body {
   border-radius: 8px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
-  transition: all 0.2s;
+  transition: all .2s;
 }
 
 #authToggle button.active {
@@ -99,7 +107,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   font-family: 'IBM Plex Mono', monospace;
-  transition: background 0.2s;
+  transition: background .2s;
 }
 
 #authSubmit:hover {
@@ -124,24 +132,63 @@ body {
   color: #e9e6de;
 }
 
-/* App Styles */
+/* =========================
+   APP
+========================= */
+
 #appContainer {
   width: 100%;
-  max-width: 500px;
+  min-height: 100vh;
   background: #14171a;
-  border-radius: 20px;
-  border: 1px solid #2a2f35;
   overflow: hidden;
+  border: none;
+  border-radius: 0;
 }
 
-/* Desktop layout */
-@media (min-width: 820px) {
+/* =========================
+   TABLET
+========================= */
+
+@media (min-width: 768px) {
+
+  body {
+    padding: 24px;
+  }
+
   #appContainer {
-    max-width: 800px;
+    max-width: 950px;
+    min-height: calc(100vh - 48px);
+    border: 1px solid #2a2f35;
+    border-radius: 20px;
   }
 }
 
-/* Rest of styles from previous implementation */
+/* =========================
+   DESKTOP
+========================= */
+
+@media (min-width: 1200px) {
+
+  #appContainer {
+    max-width: 1250px;
+  }
+}
+
+/* =========================
+   LARGE DESKTOP
+========================= */
+
+@media (min-width: 1600px) {
+
+  #appContainer {
+    max-width: 1450px;
+  }
+}
+
+/* =========================
+   YOUR EXISTING STYLES
+========================= */
+
 .ark-header {
   display: flex;
   align-items: center;
@@ -159,7 +206,7 @@ body {
 .wordmark span {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 14px;
-  letter-spacing: 0.12em;
+  letter-spacing: .12em;
 }
 
 .header-icons {
