@@ -462,3 +462,15 @@ body {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+.settings-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 5px;
+  padding: 2px 4px;
+  border-radius: 12px;
+  border: 1px solid #3a4048;
+  background: transparent;
+  color: #a6a399;
+  cursor: pointer;
+  transition: all 0.2s;
+}
