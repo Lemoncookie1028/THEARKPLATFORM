@@ -147,6 +147,62 @@
       <div class="close-panel" id="closeProfilePanel">✕ close profile</div>
     </div>
 
+    <div class="source-panel profile-panel" id="createPanel">
+      <div class="handle"></div>
+      <h4>NEW POST</h4>
+
+      <form id="createForm">
+        <div id="createTypeToggle" class="create-type-toggle">
+          <button type="button" class="active" data-type="clip">Clip</button>
+          <button type="button" data-type="card">Card</button>
+          <button type="button" data-type="article">Article</button>
+        </div>
+
+        <div class="form-group">
+          <label for="createHeadline">Headline</label>
+          <input type="text" id="createHeadline" required placeholder="What's this about?">
+        </div>
+
+        <div class="form-group">
+          <label for="createTopic">Topic</label>
+          <select id="createTopic">
+            <option value="">For You (no specific topic)</option>
+            <option value="Monetary Policy">Monetary Policy</option>
+            <option value="Space">Space</option>
+            <option value="Health">Health</option>
+          </select>
+        </div>
+
+        <div class="form-group create-field-clip">
+          <label for="createVideoUrl">Video URL</label>
+          <input type="url" id="createVideoUrl" placeholder="https://...">
+          <label for="createDuration" style="margin-top:8px;">Duration</label>
+          <input type="text" id="createDuration" placeholder="0:58">
+        </div>
+
+        <div class="form-group create-field-card" style="display:none;">
+          <label>Slides</label>
+          <div id="slideList"></div>
+          <button type="button" id="addSlideBtn" class="add-row-btn">+ Add slide</button>
+        </div>
+
+        <div class="form-group create-field-article" style="display:none;">
+          <label for="createContent">Content</label>
+          <textarea id="createContent" rows="5" placeholder="Write the full piece..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Sources</label>
+          <div id="sourceInputList"></div>
+          <button type="button" id="addSourceBtn" class="add-row-btn">+ Add source</button>
+        </div>
+
+        <button type="submit" id="publishBtn">Publish</button>
+      </form>
+
+      <div class="close-panel" id="closeCreatePanel">✕ close</div>
+    </div>
+
     <div class="toast" id="toast"></div>
   </div>
 
@@ -159,6 +215,7 @@
   <script src="/js/auth.js"></script>
   <script src="/js/profile.js"></script>
   <script src="/js/feed.js"></script>
+  <script src="/js/create.js"></script>
   <script src="/js/app.js"></script>
 </body>
 </html>

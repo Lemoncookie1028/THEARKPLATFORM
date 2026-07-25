@@ -606,3 +606,81 @@ body {
 .verify-banner-actions button:hover {
   background: #3a3020;
 }
+
+/* =========================
+   CREATE PANEL
+========================= */
+
+.create-type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.create-type-toggle button {
+  flex: 1;
+  background: #20252a;
+  border: 1px solid #2a2f35;
+  color: #a6a399;
+  border-radius: 8px;
+  padding: 8px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.create-type-toggle button.active {
+  border-color: #3fa88c;
+  color: #3fa88c;
+}
+
+#createForm select,
+#createForm textarea {
+  width: 100%;
+  background: #14171a;
+  border: 1px solid #2a2f35;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #e9e6de;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.add-row-btn {
+  background: none;
+  border: 1px dashed #3a4048;
+  color: #a6a399;
+  border-radius: 8px;
+  padding: 8px;
+  width: 100%;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.dynamic-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.dynamic-row input {
+  flex: 1;
+  background: #14171a;
+  border: 1px solid #2a2f35;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #e9e6de;
+  font-size: 12px;
+}
+
+.dynamic-row button {
+  background: none;
+  border: 1px solid #2a2f35;
+  color: #a6a399;
+  border-radius: 6px;
+  padding: 0 10px;
+  cursor: pointer;
+}

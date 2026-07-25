@@ -177,9 +177,11 @@ function setupFeedUI() {
         if (!currentUser) { showToast('Please sign in first'); return; }
         openProfile(currentUser.id);
       }
+      else if (tab === 'create') openCreatePanel();
       else showToast(`${tab[0].toUpperCase()}${tab.slice(1)} isn't built yet`);
     });
   }
 
   setupProfileUI();
+  setupCreateUI();
 }

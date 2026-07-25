@@ -14,7 +14,7 @@ function validateDisplayName(name) {
 }
 
 function validatePost(data) {
-  const { type, headline, content } = data;
+  const { type, headline, content, videoUrl, slides } = data;
   if (!type || !['clip', 'card', 'article', 'news'].includes(type)) {
     return { valid: false, error: 'Invalid post type' };
   }
@@ -23,6 +23,12 @@ function validatePost(data) {
   }
   if (type === 'article' && (!content || content.length < 10)) {
     return { valid: false, error: 'Article content must be at least 10 characters' };
+  }
+  if (type === 'clip' && (!videoUrl || !videoUrl.trim())) {
+    return { valid: false, error: 'Clips need a video URL' };
+  }
+  if (type === 'card' && (!Array.isArray(slides) || slides.length < 1)) {
+    return { valid: false, error: 'Cards need at least one slide' };
   }
   return { valid: true };
 }

@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     }
 
     // Validate post
-    const validation = validatePost({ type, headline, content });
+    const validation = validatePost({ type, headline, content, videoUrl, slides });
     if (!validation.valid) {
       return res.status(400).json({ error: validation.error });
     }
