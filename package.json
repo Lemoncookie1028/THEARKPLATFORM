@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'No build step needed'",
-    "start": "node api/_lib/firebase.js",
     "deploy": "vercel --prod"
   },
   "dependencies": {

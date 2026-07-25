@@ -1,4 +1,4 @@
-const { db } = require('../_lib/firebase');
+const { admin, db } = require('../_lib/firebase');
 const { authenticate } = require('../_lib/auth');
 
 module.exports = async (req, res) => {

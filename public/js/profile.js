@@ -50,7 +50,7 @@ async function followCreator(creatorId) {
   
   try {
     const followRef = db.collection('users')
-      .doc(currentUser.uid)
+      .doc(currentUser.id)
       .collection('follows')
       .doc(creatorId);
     

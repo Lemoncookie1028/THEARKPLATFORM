@@ -1,4 +1,4 @@
-const { db } = require('../_lib/firebase');
+const { admin, db } = require('../_lib/firebase');
 const { authenticate } = require('../_lib/auth');
 const { validatePost, sanitizeInput } = require('../_lib/validation');
 
@@ -56,21 +56,14 @@ module.exports = async (req, res) => {
         postData.topicId = topicId;
       }
 
+      // Sources are stored directly on the post doc (not a subcollection) so
+      // the feed can render them without a second read per post.
+      postData.sources = Array.isArray(sources)
+        ? sources.map(s => ({ title: sanitizeInput(s.title || ''), url: s.url || '' }))
+        : [];
+
       // Create post
       const postRef = await db.collection('posts').add(postData);
-
-      // Add sources if provided
-      if (sources && sources.length > 0) {
-        const batch = db.batch();
-        sources.forEach(source => {
-          const sourceRef = postRef.collection('sources').doc();
-          batch.set(sourceRef, {
-            ...source,
-            addedAt: admin.firestore.FieldValue.serverTimestamp()
-          });
-        });
-        await batch.commit();
-      }
 
       res.status(201).json({
         success: true,

@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   const isAuthenticated = await checkAuth();
   
   if (isAuthenticated) {
+    try {
+      currentUser = JSON.parse(localStorage.getItem('user'));
+    } catch {
+      currentUser = null;
+    }
     showApp();
     initFeed();
   } else {
