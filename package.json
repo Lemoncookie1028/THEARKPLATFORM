@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'No build step needed'",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "dev:local": "node dev-server.js"
   },
   "dependencies": {
     "firebase-admin": "^11.11.0",

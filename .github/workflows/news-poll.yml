@@ -1,0 +1,31 @@
+name: Poll news feeds
+
+# Vercel's Hobby plan only allows cron jobs to run once per day — nowhere
+# close to "shows up shortly after it's published." GitHub Actions has no
+# such limit, so this calls the same /api/news/ingest endpoint on its own
+# schedule instead. This is polling, not a push/webhook — none of the RSS
+# feeds we pull from offer real push notifications, so a few minutes of lag
+# after actual publication is the realistic floor, not true instant.
+#
+# Setup (one-time):
+#   1. Repo → Settings → Secrets and variables → Actions → New repository secret
+#      - SITE_URL     = https://your-deployed-domain.com (no trailing slash)
+#      - CRON_SECRET  = same value you set in Vercel's env vars
+#   2. Commit this file — GitHub picks the schedule up automatically.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # every 5 minutes — GitHub's practical minimum;
+                            # actual runs can lag a few minutes under load,
+                            # GitHub doesn't guarantee to-the-minute delivery
+  workflow_dispatch: {}      # lets you trigger a run manually from the Actions tab
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call news ingestion endpoint
+        run: |
+          curl -sf -X POST "${{ secrets.SITE_URL }}/api/news/ingest" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -w "\nHTTP %{http_code}\n"

@@ -684,3 +684,334 @@ body {
   padding: 0 10px;
   cursor: pointer;
 }
+
+/* =========================
+   SETTINGS PANEL
+========================= */
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section > label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: #6f6d66;
+  margin-bottom: 8px;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a2f35;
+  font-size: 13px;
+  color: #e9e6de;
+}
+
+.settings-row span:first-child {
+  color: #a6a399;
+}
+
+.profile-signout-btn {
+  width: 100%;
+  background: none;
+  border: 1px solid #3a4048;
+  color: #a6a399;
+}
+
+.profile-signout-btn:hover {
+  border-color: #d89b4a;
+  color: #d89b4a;
+}
+
+/* =========================
+   NEWS LINK-OUT
+========================= */
+
+.news-link-out {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid #2a2f35;
+  font-size: 12px;
+  color: #a6a399;
+  text-decoration: none;
+}
+
+.news-link-out:hover {
+  color: #3fa88c;
+}
+
+.news-link-out svg {
+  flex-shrink: 0;
+}
+
+/* =========================
+   REVIEW QUEUE
+========================= */
+
+.review-card {
+  background: #20252a;
+  border: 1px solid #2a2f35;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.review-slides {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #a6a399;
+  line-height: 1.6;
+}
+
+.review-slides li {
+  padding-left: 14px;
+  position: relative;
+}
+
+.review-slides li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #6f6d66;
+}
+
+.review-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.review-approve-btn,
+.review-reject-btn {
+  flex: 1;
+  border-radius: 8px;
+  padding: 8px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.review-approve-btn {
+  background: none;
+  border: 1px solid #3fa88c;
+  color: #3fa88c;
+}
+
+.review-reject-btn {
+  background: none;
+  border: 1px solid #3a4048;
+  color: #a6a399;
+}
+
+/* =========================
+   REPORT CONTROL
+========================= */
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.save-toggle-btn {
+  background: none;
+  border: none;
+  color: #3a4048;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 0;
+}
+
+.save-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.save-toggle-btn:hover {
+  color: #a6a399;
+}
+
+.save-toggle-btn.saved {
+  color: #3fa88c;
+}
+
+.save-toggle-btn.saved svg {
+  fill: currentColor;
+}
+
+.report-control {
+  position: relative;
+}
+
+.report-toggle-btn {
+  background: none;
+  border: none;
+  color: #3a4048;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.report-toggle-btn:hover {
+  color: #a6a399;
+}
+
+.report-menu {
+  display: none;
+  position: absolute;
+  bottom: 24px;
+  right: 0;
+  background: #20252a;
+  border: 1px solid #2a2f35;
+  border-radius: 8px;
+  padding: 6px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  z-index: 5;
+}
+
+.report-control.open .report-menu {
+  display: flex;
+}
+
+.report-reason-btn {
+  background: none;
+  border: none;
+  color: #a6a399;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.report-reason-btn:hover {
+  background: #2a2f35;
+  color: #e9e6de;
+}
+
+/* =========================
+   MODERATION QUEUE
+========================= */
+
+.moderation-card {
+  background: #20252a;
+  border: 1px solid #2a2f35;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.moderation-reason {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  background: #2b2419;
+  color: #d89b4a;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.moderation-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.moderation-dismiss-btn,
+.moderation-remove-btn {
+  flex: 1;
+  border-radius: 8px;
+  padding: 8px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.moderation-dismiss-btn {
+  background: none;
+  border: 1px solid #3a4048;
+  color: #a6a399;
+}
+
+.moderation-remove-btn {
+  background: none;
+  border: 1px solid #d89b4a;
+  color: #d89b4a;
+}
+
+.content-preview {
+  font-size: 13px;
+  color: #a6a399;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+/* =========================
+   HEADER SEARCH/SAVE ICONS + SEARCH BAR
+========================= */
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-icon-btn {
+  background: none;
+  border: none;
+  color: #6f6d66;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 0;
+}
+
+.header-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.header-icon-btn:hover {
+  color: #e9e6de;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #2a2f35;
+}
+
+.search-bar input {
+  flex: 1;
+  background: #14171a;
+  border: 1px solid #2a2f35;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #e9e6de;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+
+.search-bar button {
+  background: none;
+  border: none;
+  color: #6f6d66;
+  cursor: pointer;
+  font-size: 14px;
+}

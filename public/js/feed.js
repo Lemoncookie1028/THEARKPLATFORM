@@ -10,11 +10,26 @@ const TOPIC_LABELS = {
 };
 
 let clipsSeenThisSession = 0;
+let articlesUnsubscribe = null;
+
+function truncateText(text, max = 160) {
+  if (!text) return '';
+  const clean = String(text).trim();
+  return clean.length > max ? clean.slice(0, max).trim() + '…' : clean;
+}
+
+function stopArticlesRealtime() {
+  if (articlesUnsubscribe) {
+    articlesUnsubscribe();
+    articlesUnsubscribe = null;
+  }
+}
 
 function stampsFor(post) {
   const stamps = [];
   if (post.flag) stamps.push(`<span class="stamp ${post.flag.level}">${post.flag.label}</span>`);
   if (post.verifierReviewed) stamps.push('<span class="stamp teal">verifier reviewed</span>');
+  if (post.aiAssisted) stamps.push('<span class="stamp amber">AI-assisted, human-reviewed</span>');
   if (post.creatorName && post.creatorId) {
     stamps.push(`<span class="stamp creator-stamp" data-creator-id="${post.creatorId}">by ${post.creatorName}</span>`);
   } else if (post.creatorName) {
@@ -40,9 +55,11 @@ function renderPost(post) {
   }
 
   if (post.type === 'card') {
+    const firstSlide = (post.slides || [])[0];
     return `
       <div class="meta"><span>CARD · ${(post.slides || []).length} SLIDES</span><span>${sourceLabel}</span></div>
       <p class="headline">${post.headline}</p>
+      ${firstSlide ? `<p class="content-preview">${truncateText(firstSlide.caption, 140)}</p>` : ''}
       ${stampsFor(post)}
     `;
   }
@@ -52,6 +69,7 @@ function renderPost(post) {
     return `
       <div class="meta"><span>ARTICLE · ${minutes} MIN READ</span><span>${sourceLabel}</span></div>
       <p class="headline">${post.headline}</p>
+      ${post.content ? `<p class="content-preview">${truncateText(post.content, 180)}</p>` : ''}
       ${stampsFor(post)}
     `;
   }
@@ -61,22 +79,104 @@ function renderPost(post) {
       <div class="meta"><span>NEWS · ${(post.sourceName || 'UNKNOWN').toUpperCase()}</span><span>${formatDate(post.timestamp).toUpperCase()}</span></div>
       <p class="headline">${post.headline}</p>
       <p class="snippet" style="font-size:13px; color:#a6a399; line-height:1.5;">${post.snippet || ''}</p>
+      ${post.sourceUrl ? `
+        <a class="news-link-out" href="${post.sourceUrl}" target="_blank" rel="noopener noreferrer">
+          <span>Read on ${post.sourceName || 'source'}</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+      ` : ''}
     `;
   }
 
   return `<p class="headline">${post.headline || 'Untitled'}</p>`;
 }
 
+const REPORT_REASONS = [
+  { value: 'misleading', label: 'Misleading' },
+  { value: 'spam', label: 'Spam' },
+  { value: 'harassment', label: 'Harassment' },
+  { value: 'other', label: 'Other' },
+];
+
+function saveToggleHtml() {
+  return `<button type="button" class="save-toggle-btn" aria-label="Save this post">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+  </button>`;
+}
+
+function reportControlHtml() {
+  return `
+    <div class="report-control">
+      <button type="button" class="report-toggle-btn" aria-label="Report this post">⚑</button>
+      <div class="report-menu">
+        ${REPORT_REASONS.map(r => `<button type="button" class="report-reason-btn" data-reason="${r.value}">${r.label}</button>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+async function submitReport(postId, reason) {
+  const token = localStorage.getItem('token');
+  if (!token) { showToast('Please sign in first'); return false; }
+
+  try {
+    const res = await fetch(`${API_URL}/flags/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ postId, reason }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Failed to report'); return false; }
+    return true;
+  } catch (error) {
+    showToast('Failed to report: ' + error.message);
+    return false;
+  }
+}
+
 function buildCardEl(post) {
   const el = document.createElement('div');
   el.className = 'card';
   el.dataset.postId = post.id;
-  el.innerHTML = `<div class="card-body">${renderPost(post)}</div>`;
+  el.innerHTML = `<div class="card-body">${renderPost(post)}<div class="card-actions">${saveToggleHtml()}${reportControlHtml()}</div></div>`;
   el.addEventListener('click', (e) => {
     const stamp = e.target.closest('.creator-stamp');
     if (stamp) {
       e.stopPropagation();
       openProfile(stamp.dataset.creatorId);
+      return;
+    }
+    if (e.target.closest('.news-link-out')) {
+      e.stopPropagation();
+      return; // let the anchor's own navigation happen
+    }
+
+    const saveToggle = e.target.closest('.save-toggle-btn');
+    if (saveToggle) {
+      e.stopPropagation();
+      toggleSave(post.id, saveToggle);
+      return;
+    }
+
+    const reportToggle = e.target.closest('.report-toggle-btn');
+    if (reportToggle) {
+      e.stopPropagation();
+      reportToggle.closest('.report-control').classList.toggle('open');
+      return;
+    }
+
+    const reasonBtn = e.target.closest('.report-reason-btn');
+    if (reasonBtn) {
+      e.stopPropagation();
+      const control = reasonBtn.closest('.report-control');
+      submitReport(post.id, reasonBtn.dataset.reason).then((ok) => {
+        showToast(ok ? "Reported — thanks, this helps keep the feed trustworthy" : 'Failed to report');
+        control.classList.remove('open');
+      });
       return;
     }
     openSourcePanel(post);
@@ -96,6 +196,12 @@ async function fetchFeed(topicKey) {
 }
 
 async function initFeed(topicKey = 'for-you') {
+  if (topicKey === 'articles') {
+    initArticlesRealtime();
+    return;
+  }
+  stopArticlesRealtime();
+
   const container = document.getElementById('feedContainer');
   const nudge = document.getElementById('depthNudge');
   if (!container) return;
@@ -123,6 +229,42 @@ async function initFeed(topicKey = 'for-you') {
     console.error('Feed load error:', error);
     container.innerHTML = `<div class="card"><div class="card-body"><p class="headline">Couldn't load the feed. Pull to refresh.</p></div></div>`;
   }
+}
+
+// Live-updating Articles section — uses the Firestore client SDK directly
+// (onSnapshot) instead of the one-shot /api/posts/feed fetch, so new
+// articles appear the moment they're published, no refresh needed.
+// Requires a Firestore composite index on (type ASC, timestamp DESC) —
+// see firestore.indexes.json.
+function initArticlesRealtime() {
+  const container = document.getElementById('feedContainer');
+  const nudge = document.getElementById('depthNudge');
+  if (!container) return;
+
+  stopArticlesRealtime();
+  container.innerHTML = '';
+  if (nudge) nudge.style.display = 'none';
+
+  articlesUnsubscribe = db.collection('posts')
+    .where('type', '==', 'article')
+    .orderBy('timestamp', 'desc')
+    .limit(20)
+    .onSnapshot(
+      (snapshot) => {
+        container.innerHTML = '';
+        if (snapshot.empty) {
+          container.innerHTML = `<div class="card"><div class="card-body"><p class="headline">No articles yet — be the first to write one.</p></div></div>`;
+          return;
+        }
+        snapshot.forEach((doc) => {
+          container.appendChild(buildCardEl({ id: doc.id, ...doc.data() }));
+        });
+      },
+      (error) => {
+        console.error('Articles realtime error:', error);
+        container.innerHTML = `<div class="card"><div class="card-body"><p class="headline">Couldn't load articles live — check your connection.</p></div></div>`;
+      }
+    );
 }
 
 function openSourcePanel(post) {
@@ -178,10 +320,16 @@ function setupFeedUI() {
         openProfile(currentUser.id);
       }
       else if (tab === 'create') openCreatePanel();
+      else if (tab === 'settings') openSettingsPanel();
       else showToast(`${tab[0].toUpperCase()}${tab.slice(1)} isn't built yet`);
     });
   }
 
   setupProfileUI();
   setupCreateUI();
+  setupSettingsUI();
+  setupReviewUI();
+  setupModerationUI();
+  setupSearchUI();
+  setupSavesUI();
 }

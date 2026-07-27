@@ -1,5 +1,6 @@
 const Parser = require('rss-parser');
 const { db, admin } = require('../_lib/firebase');
+const { draftCardFromNews } = require('../_lib/ai');
 
 const parser = new Parser({ timeout: 10000 });
 
@@ -65,6 +66,34 @@ module.exports = async (req, res) => {
 
         await db.collection('posts').add(postData);
         results.added += 1;
+
+        // Draft an AI-summarized Card from this item for human review.
+        // Failures here don't affect the news post above — that's already
+        // published, this is a separate, optional, best-effort step.
+        if (process.env.GEMINI_API_KEY) {
+          try {
+            const draft = await draftCardFromNews({
+              headline: postData.headline,
+              snippet: postData.snippet,
+              sourceName: feed.sourceName,
+              sourceUrl: link,
+            });
+
+            await db.collection('drafts').add({
+              type: 'card',
+              headline: draft.headline,
+              slides: draft.slides,
+              sourceName: feed.sourceName,
+              sourceUrl: link,
+              topicId: feed.topic || null,
+              status: 'pending',
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            results.drafted = (results.drafted || 0) + 1;
+          } catch (draftErr) {
+            results.errors.push(`AI draft (${feed.sourceName}): ${draftErr.message}`);
+          }
+        }
       }
     } catch (err) {
       results.errors.push(`${feed.sourceName}: ${err.message}`);

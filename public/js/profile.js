@@ -152,10 +152,12 @@ async function openProfile(userId) {
 
   const followBtn = document.getElementById('profileFollowBtn');
   const editBtn = document.getElementById('profileEditBtn');
+  const signOutBtn = document.getElementById('signOutBtn');
 
   if (isOwnProfile) {
     followBtn.style.display = 'none';
     editBtn.style.display = 'block';
+    if (signOutBtn) signOutBtn.style.display = 'block';
     editBtn.onclick = () => {
       document.getElementById('editDisplayName').value = name;
       document.getElementById('editBio').value = profile.bio || '';
@@ -164,6 +166,7 @@ async function openProfile(userId) {
     };
   } else {
     editBtn.style.display = 'none';
+    if (signOutBtn) signOutBtn.style.display = 'none';
     followBtn.style.display = 'block';
     // We don't track per-viewer follow state locally, so just reflect the
     // action taken rather than pre-computing "already following."
