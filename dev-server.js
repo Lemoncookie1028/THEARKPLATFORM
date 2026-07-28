@@ -20,6 +20,12 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // Recursively walk api/ and mount every .js file (except _lib) at the path
 // Vercel's file-based routing would give it — api/posts/create.js -> /api/posts/create
+//
+// Also understands Vercel's catch-all convention: a file named
+// [...action].js mounts as a wildcard and populates req.query.action with
+// the path segments after it, exactly like Vercel does — e.g.
+// api/auth/[...action].js handling /api/auth/signin gives req.query.action
+// = ['signin'], same as in production.
 function mountApiRoutes(dir, base = '/api') {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '_lib') continue;
@@ -28,16 +34,31 @@ function mountApiRoutes(dir, base = '/api') {
     if (entry.isDirectory()) {
       mountApiRoutes(fullPath, `${base}/${entry.name}`);
     } else if (entry.name.endsWith('.js')) {
-      const routeName = entry.name.replace(/\.js$/, '');
-      const routePath = `${base}/${routeName}`;
+      const catchAllMatch = entry.name.match(/^\[\.\.\.(\w+)\]\.js$/);
       const handler = require(fullPath);
-      app.all(routePath, (req, res) => {
-        Promise.resolve(handler(req, res)).catch((err) => {
-          console.error(`Error in ${routePath}:`, err);
-          if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+
+      if (catchAllMatch) {
+        const paramName = catchAllMatch[1];
+        const routePath = `${base}/*`;
+        app.all(routePath, (req, res) => {
+          req.query[paramName] = req.params[0] ? req.params[0].split('/') : [];
+          Promise.resolve(handler(req, res)).catch((err) => {
+            console.error(`Error in ${routePath}:`, err);
+            if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+          });
         });
-      });
-      console.log(`mounted ${routePath}`);
+        console.log(`mounted ${routePath} (catch-all -> req.query.${paramName})`);
+      } else {
+        const routeName = entry.name.replace(/\.js$/, '');
+        const routePath = `${base}/${routeName}`;
+        app.all(routePath, (req, res) => {
+          Promise.resolve(handler(req, res)).catch((err) => {
+            console.error(`Error in ${routePath}:`, err);
+            if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+          });
+        });
+        console.log(`mounted ${routePath}`);
+      }
     }
   }
 }
