@@ -1053,3 +1053,104 @@ body {
   cursor: pointer;
   font-size: 14px;
 }
+
+/* =========================
+   CARD SLIDE VIEWER
+========================= */
+
+.card-viewer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #14171a;
+  z-index: 300;
+  flex-direction: column;
+}
+
+.card-viewer.open {
+  display: flex;
+}
+
+.card-viewer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 10px;
+}
+
+.card-viewer-top span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #6f6d66;
+}
+
+.card-viewer-top button {
+  background: none;
+  border: none;
+  color: #a6a399;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.card-viewer-dots {
+  display: flex;
+  gap: 5px;
+  padding: 0 18px 16px;
+}
+
+.card-viewer-dots .dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: #2a2f35;
+}
+
+.card-viewer-dots .dot.active {
+  background: #e9e6de;
+}
+
+.card-viewer-dots .dot.done {
+  background: #4a5058;
+}
+
+.card-viewer-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 32px 60px;
+}
+
+.card-viewer-headline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: #6f6d66;
+  margin-bottom: 14px;
+}
+
+.card-viewer-caption {
+  font-family: 'Source Serif 4', serif;
+  font-size: 22px;
+  line-height: 1.5;
+  color: #e9e6de;
+}
+
+.card-viewer-tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.card-viewer-tap-left {
+  left: 0;
+}
+
+.card-viewer-tap-right {
+  right: 0;
+}

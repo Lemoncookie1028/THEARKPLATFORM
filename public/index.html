@@ -273,6 +273,20 @@
       <div class="close-panel" id="closeSavedPanel">✕ close saved</div>
     </div>
 
+    <div class="card-viewer" id="cardViewerPanel">
+      <div class="card-viewer-top">
+        <span id="cardViewerTopic">CARD</span>
+        <button type="button" id="closeCardViewer" aria-label="Close">✕</button>
+      </div>
+      <div class="card-viewer-dots" id="cardViewerDots"></div>
+      <div class="card-viewer-body">
+        <div class="card-viewer-tap-zone card-viewer-tap-left" id="cardViewerPrev" aria-label="Previous slide"></div>
+        <div class="card-viewer-tap-zone card-viewer-tap-right" id="cardViewerNext" aria-label="Next slide"></div>
+        <p class="card-viewer-headline" id="cardViewerHeadline"></p>
+        <p class="card-viewer-caption" id="cardViewerCaption"></p>
+      </div>
+    </div>
+
     <div class="toast" id="toast"></div>
   </div>
 
@@ -289,6 +303,7 @@
   <script src="/js/moderation.js"></script>
   <script src="/js/search.js"></script>
   <script src="/js/saves.js"></script>
+  <script src="/js/card-viewer.js"></script>
   <script src="/js/feed.js"></script>
   <script src="/js/create.js"></script>
   <script src="/js/app.js"></script>

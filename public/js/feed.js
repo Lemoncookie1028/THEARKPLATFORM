@@ -179,7 +179,11 @@ function buildCardEl(post) {
       });
       return;
     }
-    openSourcePanel(post);
+    if (post.type === 'card') {
+      openCardViewer(post);
+    } else {
+      openSourcePanel(post);
+    }
   });
   return el;
 }
@@ -332,4 +336,5 @@ function setupFeedUI() {
   setupModerationUI();
   setupSearchUI();
   setupSavesUI();
+  setupCardViewerUI();
 }
