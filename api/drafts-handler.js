@@ -1,5 +1,5 @@
-const { applyCors } = require('../_lib/cors');
-const handlers = require('../_lib/handlers/drafts-handlers');
+const { applyCors } = require('./_lib/cors');
+const handlers = require('./_lib/handlers/drafts-handlers');
 
 const ROUTES = {
   list: handlers.list,

@@ -1,10 +1,9 @@
-const { applyCors } = require('../_lib/cors');
-const handlers = require('../_lib/handlers/flags-handlers');
+const { applyCors } = require('./_lib/cors');
+const handlers = require('./_lib/handlers/posts-handlers');
 
 const ROUTES = {
   create: handlers.create,
-  list: handlers.list,
-  resolve: handlers.resolve,
+  feed: handlers.feed,
 };
 
 module.exports = async (req, res) => {

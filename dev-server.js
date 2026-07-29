@@ -19,13 +19,7 @@ const API_DIR = path.join(__dirname, 'api');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // Recursively walk api/ and mount every .js file (except _lib) at the path
-// Vercel's file-based routing would give it — api/posts/create.js -> /api/posts/create
-//
-// Also understands Vercel's catch-all convention: a file named
-// [...action].js mounts as a wildcard and populates req.query.action with
-// the path segments after it, exactly like Vercel does — e.g.
-// api/auth/[...action].js handling /api/auth/signin gives req.query.action
-// = ['signin'], same as in production.
+// Vercel's file-based routing would give it — api/posts-handler.js -> /api/posts-handler
 function mountApiRoutes(dir, base = '/api') {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === '_lib') continue;
@@ -34,36 +28,41 @@ function mountApiRoutes(dir, base = '/api') {
     if (entry.isDirectory()) {
       mountApiRoutes(fullPath, `${base}/${entry.name}`);
     } else if (entry.name.endsWith('.js')) {
-      const catchAllMatch = entry.name.match(/^\[\.\.\.(\w+)\]\.js$/);
+      const routeName = entry.name.replace(/\.js$/, '');
+      const routePath = `${base}/${routeName}`;
       const handler = require(fullPath);
-
-      if (catchAllMatch) {
-        const paramName = catchAllMatch[1];
-        const routePath = `${base}/*`;
-        app.all(routePath, (req, res) => {
-          req.query[paramName] = req.params[0] ? req.params[0].split('/') : [];
-          Promise.resolve(handler(req, res)).catch((err) => {
-            console.error(`Error in ${routePath}:`, err);
-            if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
-          });
+      app.all(routePath, (req, res) => {
+        Promise.resolve(handler(req, res)).catch((err) => {
+          console.error(`Error in ${routePath}:`, err);
+          if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
         });
-        console.log(`mounted ${routePath} (catch-all -> req.query.${paramName})`);
-      } else {
-        const routeName = entry.name.replace(/\.js$/, '');
-        const routePath = `${base}/${routeName}`;
-        app.all(routePath, (req, res) => {
-          Promise.resolve(handler(req, res)).catch((err) => {
-            console.error(`Error in ${routePath}:`, err);
-            if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
-          });
-        });
-        console.log(`mounted ${routePath}`);
-      }
+      });
+      console.log(`mounted ${routePath}`);
     }
   }
 }
 
+// Mirrors the "rewrites" array in vercel.json — Vercel resolves those at
+// the platform level, but locally we need to replicate them ourselves so
+// e.g. /api/auth/signin still reaches api/auth-handler.js the same way.
+function mountRewrite(publicPath, handlerFile) {
+  const handler = require(path.join(API_DIR, handlerFile));
+  app.all(`${publicPath}/:action`, (req, res) => {
+    req.query.action = req.params.action;
+    Promise.resolve(handler(req, res)).catch((err) => {
+      console.error(`Error in ${publicPath}/:action:`, err);
+      if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
+    });
+  });
+  console.log(`mounted ${publicPath}/:action -> ${handlerFile} (rewrite)`);
+}
+
 mountApiRoutes(API_DIR);
+
+mountRewrite('/api/auth', 'auth-handler.js');
+mountRewrite('/api/posts', 'posts-handler.js');
+mountRewrite('/api/drafts', 'drafts-handler.js');
+mountRewrite('/api/flags', 'flags-handler.js');
 
 // Static frontend, served last so it doesn't shadow /api routes
 app.use(express.static(PUBLIC_DIR));

@@ -1,5 +1,5 @@
-const { applyCors } = require('../_lib/cors');
-const handlers = require('../_lib/handlers/auth-handlers');
+const { applyCors } = require('./_lib/cors');
+const handlers = require('./_lib/handlers/auth-handlers');
 
 const ROUTES = {
   signin: handlers.signin,
@@ -12,8 +12,10 @@ const ROUTES = {
 module.exports = async (req, res) => {
   if (applyCors(req, res)) return;
 
-  // Vercel's catch-all route (api/auth/[...action].js) gives us the path
-  // segments after /api/auth/ as an array — e.g. /api/auth/signin -> ['signin']
+  // Reached via the rewrite in vercel.json: /api/auth/:action ->
+  // /api/auth-handler?action=:action — action always arrives as a plain
+  // query string value here (not an array), since it's a rewrite param,
+  // not a Vercel catch-all-route segment array.
   const action = Array.isArray(req.query.action) ? req.query.action[0] : req.query.action;
   const handler = ROUTES[action];
 

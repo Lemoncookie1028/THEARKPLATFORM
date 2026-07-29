@@ -23,5 +23,11 @@
         { "key": "Cache-Control", "value": "no-cache" }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/api/auth/:action", "destination": "/api/auth-handler?action=:action" },
+    { "source": "/api/posts/:action", "destination": "/api/posts-handler?action=:action" },
+    { "source": "/api/drafts/:action", "destination": "/api/drafts-handler?action=:action" },
+    { "source": "/api/flags/:action", "destination": "/api/flags-handler?action=:action" }
   ]
 }
