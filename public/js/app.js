@@ -13,6 +13,13 @@ async function checkAuth() {
         'Authorization': `Bearer ${token}`
       }
     });
+    if (!response.ok) {
+      // Token is invalid/expired (e.g. JWT_SECRET rotated on a deploy) —
+      // clear it instead of leaving a dead token sitting in localStorage,
+      // which would otherwise keep failing silently on every future load.
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
     return response.ok;
   } catch {
     return false;
