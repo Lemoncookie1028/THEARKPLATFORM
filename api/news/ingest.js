@@ -2,7 +2,7 @@ const Parser = require('rss-parser');
 const { db, admin } = require('../_lib/firebase');
 const { draftCardFromNews } = require('../_lib/ai');
 
-const parser = new Parser({ timeout: 10000 });
+const parser = new Parser({ timeout: 100000000000000 });
 
 // Curated feed list mapped to the platform's fixed topic taxonomy.
 // These are placeholders — swap in whichever outlets you want to pull from.
