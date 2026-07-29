@@ -404,12 +404,46 @@ body {
   color: #e9e6de;
 }
 
+/* =========================
+   BOTTOM BAR - FIXED
+========================= */
+
 .bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-around;
   padding: 14px 0 16px;
   border-top: 1px solid #2a2f35;
   background: #14171a;
+  z-index: 50;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .bottom-bar {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 948px;
+    border-radius: 0 0 20px 20px;
+    border-left: 1px solid #2a2f35;
+    border-right: 1px solid #2a2f35;
+    border-bottom: 1px solid #2a2f35;
+  }
+}
+
+@media (min-width: 1200px) {
+  .bottom-bar {
+    max-width: 1248px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .bottom-bar {
+    max-width: 1448px;
+  }
 }
 
 .bottom-bar svg {
@@ -425,6 +459,10 @@ body {
   stroke: #e9e6de;
 }
 
+/* Add padding to the feed container so content doesn't get hidden behind the fixed bottom bar */
+#feedContainer {
+  padding-bottom: 80px;
+}
 .depth-nudge {
   background: #1b1f23;
   padding: 12px 20px;
