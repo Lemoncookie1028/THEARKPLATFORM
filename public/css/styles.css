@@ -146,6 +146,7 @@ body {
   overflow: hidden;
   border: none;
   border-radius: 0;
+  position: relative;
 }
 
 /* =========================
@@ -1174,4 +1175,94 @@ body {
 
 .card-viewer-tap-right {
   right: 0;
+}
+
+/* =========================
+   FEED SIDE NAV ARROWS (desktop keyboard/click nav)
+========================= */
+
+.feed-nav-arrows {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 50;
+}
+
+.feed-nav-arrows button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(20, 23, 26, 0.85);
+  border: 1px solid #2a2f35;
+  color: #e9e6de;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-nav-arrows button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.feed-nav-arrows button:hover {
+  background: #20252a;
+  border-color: #3fa88c;
+}
+
+/* Mobile relies on swipe — the buttons would just be in the way of thumb reach */
+@media (max-width: 767px) {
+  .feed-nav-arrows {
+    display: none;
+  }
+}
+
+/* =========================
+   DESKTOP FEED NAV ARROWS
+========================= */
+
+.feed-nav-arrows {
+  display: none; /* mobile relies on native swipe; these are desktop-only */
+}
+
+@media (min-width: 768px) {
+  .feed-nav-arrows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+  }
+
+  .feed-nav-arrows button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(20, 23, 26, 0.85);
+    border: 1px solid #2a2f35;
+    color: #a6a399;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .feed-nav-arrows button:hover {
+    color: #e9e6de;
+    border-color: #3a4048;
+  }
+
+  .feed-nav-arrows button svg {
+    width: 18px;
+    height: 18px;
+  }
 }

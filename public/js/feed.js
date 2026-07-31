@@ -337,4 +337,40 @@ function setupFeedUI() {
   setupSearchUI();
   setupSavesUI();
   setupCardViewerUI();
+  setupFeedNavUI();
+}
+
+// Every card is exactly one feedContainer-height tall, so "next/previous
+// post" is just "scroll by exactly one container height" — scroll-snap
+// handles settling it cleanly into place.
+function scrollFeedByCard(direction) {
+  const container = document.getElementById('feedContainer');
+  if (!container) return;
+  container.scrollBy({ top: direction * container.clientHeight, behavior: 'smooth' });
+}
+
+function setupFeedNavUI() {
+  const prevBtn = document.getElementById('feedPrevBtn');
+  const nextBtn = document.getElementById('feedNextBtn');
+  if (prevBtn) prevBtn.addEventListener('click', () => scrollFeedByCard(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => scrollFeedByCard(1));
+
+  document.addEventListener('keydown', (e) => {
+    // Don't hijack arrow keys while typing (search box, create form, etc.)
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+    // The card slide viewer is its own full-screen overlay — arrow keys
+    // scrolling the feed underneath it while it's open would be confusing.
+    const viewerOpen = document.getElementById('cardViewerPanel')?.classList.contains('open');
+    if (viewerOpen) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      scrollFeedByCard(1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollFeedByCard(-1);
+    }
+  });
 }
