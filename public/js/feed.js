@@ -12,12 +12,6 @@ const TOPIC_LABELS = {
 let clipsSeenThisSession = 0;
 let articlesUnsubscribe = null;
 
-function truncateText(text, max = 160) {
-  if (!text) return '';
-  const clean = String(text).trim();
-  return clean.length > max ? clean.slice(0, max).trim() + '…' : clean;
-}
-
 function stopArticlesRealtime() {
   if (articlesUnsubscribe) {
     articlesUnsubscribe();

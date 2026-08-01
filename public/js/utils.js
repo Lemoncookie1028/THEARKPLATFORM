@@ -28,8 +28,8 @@ function formatDate(timestamp) {
 // Truncate text
 function truncateText(text, maxLength = 100) {
   if (!text) return '';
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '…';
+  const clean = String(text).trim();
+  return clean.length > maxLength ? clean.slice(0, maxLength).trim() + '…' : clean;
 }
 
 // Generate initials from name
