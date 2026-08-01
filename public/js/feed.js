@@ -331,4 +331,52 @@ function setupFeedUI() {
   setupSearchUI();
   setupSavesUI();
   setupCardViewerUI();
+  setupFeedWheelNav();
+}
+
+// Desktop mouse-wheel / trackpad navigation for the snap-scroll feed.
+// CSS scroll-snap alone can settle mid-transition with rapid wheel deltas
+// (common on trackpads), leaving two cards partially visible at once —
+// handling wheel events explicitly in JS avoids that: one gesture always
+// means exactly one card, using each card's real on-screen position
+// rather than assuming uniform spacing.
+let feedWheelLocked = false;
+
+function currentCardIndex(container) {
+  const cards = [...container.querySelectorAll('.card')];
+  let closest = 0;
+  let closestDist = Infinity;
+  cards.forEach((card, i) => {
+    const dist = Math.abs(card.offsetTop - container.scrollTop);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closest = i;
+    }
+  });
+  return closest;
+}
+
+function scrollToCardIndex(container, index) {
+  const cards = container.querySelectorAll('.card');
+  if (!cards.length) return;
+  const clamped = Math.max(0, Math.min(index, cards.length - 1));
+  cards[clamped].scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setupFeedWheelNav() {
+  const container = document.getElementById('feedContainer');
+  if (!container) return;
+
+  container.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (feedWheelLocked) return;
+
+    const direction = e.deltaY > 0 ? 1 : -1;
+    scrollToCardIndex(container, currentCardIndex(container) + direction);
+
+    // Locked for roughly the smooth-scroll duration so a long trackpad
+    // gesture (many rapid wheel events) still only moves one card.
+    feedWheelLocked = true;
+    setTimeout(() => { feedWheelLocked = false; }, 500);
+  }, { passive: false });
 }
