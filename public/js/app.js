@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 function showApp() {
   document.getElementById('authContainer').style.display = 'none';
-  document.getElementById('appContainer').style.display = 'block';
+  document.getElementById('appContainer').style.display = 'flex';
 }
 
 function showAuth() {

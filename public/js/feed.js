@@ -72,7 +72,7 @@ function renderPost(post) {
     return `
       <div class="meta"><span>NEWS · ${(post.sourceName || 'UNKNOWN').toUpperCase()}</span><span>${formatDate(post.timestamp).toUpperCase()}</span></div>
       <p class="headline">${post.headline}</p>
-      <p class="snippet" style="font-size:13px; color:#a6a399; line-height:1.5;">${post.snippet || ''}</p>
+      <p class="content-preview">${post.snippet || ''}</p>
       ${post.sourceUrl ? `
         <a class="news-link-out" href="${post.sourceUrl}" target="_blank" rel="noopener noreferrer">
           <span>Read on ${post.sourceName || 'source'}</span>
@@ -136,7 +136,7 @@ function buildCardEl(post) {
   const el = document.createElement('div');
   el.className = 'card';
   el.dataset.postId = post.id;
-  el.innerHTML = `<div class="card-body">${renderPost(post)}<div class="card-actions">${saveToggleHtml()}${reportControlHtml()}</div></div>`;
+  el.innerHTML = `<div class="perf"></div><div class="card-body">${renderPost(post)}<div class="card-actions">${saveToggleHtml()}${reportControlHtml()}</div></div>`;
   el.addEventListener('click', (e) => {
     const stamp = e.target.closest('.creator-stamp');
     if (stamp) {

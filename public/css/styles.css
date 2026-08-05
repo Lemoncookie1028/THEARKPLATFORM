@@ -283,41 +283,68 @@ body {
   background: #1a1e22;
 }
 
+/* The signature element — every post reads as a wire-service printout
+   this platform pulled in and is vouching for, not just another feed
+   item. Runs the full height of the card now that there's room for it
+   to actually register instead of disappearing in a compact row. */
+.card .perf {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  background-image: radial-gradient(circle, #2a2f35 1.6px, transparent 1.6px);
+  background-size: 18px 13px;
+  background-position: center;
+  pointer-events: none;
+}
+
 .card-body {
   height: 100%;
   overflow-y: auto;
-  padding: 56px 18px 88px 28px; /* top padding gives breathing room (content isn't vertically centered, so it can't clip); bottom padding clears the fixed bottom nav */
+  padding: 64px 24px 96px 44px; /* left padding clears the perforated edge; top/bottom give breathing room and clear the fixed bottom nav */
 }
 
 .meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
   color: #6f6d66;
-  margin-bottom: 8px;
+  margin-bottom: 18px;
 }
 
 .headline {
   font-family: 'Source Serif 4', serif;
-  font-size: 17px;
-  line-height: 1.45;
+  font-size: 28px;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
   color: #e9e6de;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+}
+
+.content-preview {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #a6a399;
+  margin-bottom: 18px;
+  max-width: 46em;
 }
 
 .stamp-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .stamp {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
-  padding: 3px 10px;
-  border-radius: 4px;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 5px;
   background: #20252a;
   color: #a6a399;
 }
@@ -326,14 +353,16 @@ body {
 .stamp.amber { background: #2b2419; color: #d89b4a; }
 
 .waterline {
-  height: 3px;
+  height: 4px;
   background: #20252a;
   border-radius: 2px;
-  margin: 10px 0 4px;
+  margin: 18px 0 6px;
+  max-width: 320px;
 }
 
 .waterline .fill {
   height: 100%;
+  border-radius: 2px;
   background: #3fa88c;
   width: 82%;
 }
@@ -341,6 +370,7 @@ body {
 .waterline-label {
   display: flex;
   justify-content: space-between;
+  max-width: 320px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
   color: #6f6d66;
@@ -476,6 +506,11 @@ body {
 /* Add padding to the feed container so content doesn't get hidden behind the fixed bottom bar */
 #feedContainer {
   flex: 1;
+  min-height: 0; /* flex items default to min-height:auto, which refuses to
+    shrink below content size — without this override, feedContainer grows
+    to fit ALL stacked cards combined instead of its allocated flex space,
+    which pushes the whole page taller than the screen and lets the header
+    scroll away with everything else instead of staying fixed in place */
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none; /* Firefox */
@@ -881,7 +916,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid #20252a;
 }
 
 .save-toggle-btn {
