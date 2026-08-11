@@ -30,4 +30,6 @@ function setupSettingsUI() {
       await resetPassword(currentUser.email);
     });
   }
+
+  setupReadAloudSettings();
 }

@@ -32,6 +32,17 @@ function truncateText(text, maxLength = 100) {
   return clean.length > maxLength ? clean.slice(0, maxLength).trim() + '…' : clean;
 }
 
+// Safe to embed inside an HTML attribute value (e.g. data-* attributes
+// carrying user-generated or fetched text)
+function escapeHtmlAttr(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 // Generate initials from name
 function getInitials(name) {
   if (!name) return 'U';

@@ -60,9 +60,11 @@ function renderPost(post) {
 
   if (post.type === 'article') {
     const minutes = Math.max(1, Math.round((post.content || '').split(' ').length / 200));
+    const showListen = post.content && typeof isReadAloudEnabled === 'function' && isReadAloudEnabled();
     return `
       <div class="meta"><span>ARTICLE · ${minutes} MIN READ</span><span>${sourceLabel}</span></div>
       <p class="headline">${post.headline}</p>
+      ${showListen ? `<div data-speak-text="${escapeHtmlAttr(post.content)}">${listenBtnHtml()}</div>` : ''}
       ${post.content ? `<p class="content-preview">${truncateText(post.content, 180)}</p>` : ''}
       ${stampsFor(post)}
     `;
@@ -147,6 +149,15 @@ function buildCardEl(post) {
     if (e.target.closest('.news-link-out')) {
       e.stopPropagation();
       return; // let the anchor's own navigation happen
+    }
+
+    const listenBtn = e.target.closest('.listen-btn');
+    if (listenBtn) {
+      e.stopPropagation();
+      const wrapper = listenBtn.closest('[data-speak-text]');
+      const text = wrapper ? wrapper.dataset.speakText : post.content;
+      toggleReadAloud(text, listenBtn);
+      return;
     }
 
     const saveToggle = e.target.closest('.save-toggle-btn');
