@@ -37,11 +37,21 @@ async function signin(req, res) {
 
     if (!verifyRes.ok) {
       const code = verifyData.error?.message || '';
+      // Deliberately the same message for "no such account" and "wrong
+      // password" — telling them apart would let anyone probe which emails
+      // are registered (Firebase itself returns one combined code for the
+      // same reason). The UI explains this to the user instead.
       if (code.startsWith('EMAIL_NOT_FOUND') || code.startsWith('INVALID_PASSWORD') || code.startsWith('INVALID_LOGIN_CREDENTIALS')) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Incorrect email or password', code: 'invalid-credentials' });
+      }
+      if (code.startsWith('TOO_MANY_ATTEMPTS_TRY_LATER')) {
+        return res.status(429).json({ error: 'Too many failed attempts. Wait a few minutes, or reset your password.', code: 'too-many-attempts' });
+      }
+      if (code.startsWith('USER_DISABLED')) {
+        return res.status(403).json({ error: 'This account has been disabled.', code: 'user-disabled' });
       }
       console.error('Signin verify error:', verifyData);
-      return res.status(500).json({ error: 'Failed to sign in' });
+      return res.status(500).json({ error: 'Something went wrong on our end. Please try again.', code: 'server-error' });
     }
 
     const userRecord = await auth.getUser(verifyData.localId);
@@ -54,7 +64,7 @@ async function signin(req, res) {
     });
   } catch (error) {
     console.error('Signin error:', error);
-    res.status(500).json({ error: 'Failed to sign in: ' + error.message });
+    res.status(500).json({ error: 'Something went wrong on our end. Please try again.', code: 'server-error' });
   }
 }
 
@@ -69,13 +79,13 @@ async function signup(req, res) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   if (!validateEmail(email)) {
-    return res.status(400).json({ error: 'Invalid email format' });
+    return res.status(400).json({ error: 'That doesn\'t look like a valid email address', code: 'invalid-email' });
   }
   if (!validatePassword(password)) {
-    return res.status(400).json({ error: 'Password must be at least 8 characters with letters and numbers' });
+    return res.status(400).json({ error: 'Password must be at least 8 characters and include both letters and numbers', code: 'weak-password' });
   }
   if (!validateDisplayName(displayName)) {
-    return res.status(400).json({ error: 'Display name must be 2-50 characters' });
+    return res.status(400).json({ error: 'Display name must be 2–50 characters', code: 'invalid-name' });
   }
 
   try {
@@ -116,9 +126,9 @@ async function signup(req, res) {
   } catch (error) {
     console.error('Signup error:', error);
     if (error.code === 'auth/email-already-exists') {
-      return res.status(400).json({ error: 'Email already in use' });
+      return res.status(400).json({ error: 'An account with this email already exists. Try signing in instead.', code: 'email-in-use' });
     }
-    res.status(500).json({ error: 'Failed to create account: ' + error.message });
+    res.status(500).json({ error: 'Something went wrong on our end. Please try again.', code: 'server-error' });
   }
 }
 
@@ -148,12 +158,43 @@ async function resetPassword(req, res) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
+  if (!process.env.FIREBASE_API_KEY) {
+    console.error('FIREBASE_API_KEY is not set — cannot send reset emails');
+    return res.status(500).json({ error: 'Something went wrong on our end. Please try again.', code: 'server-error' });
+  }
+
   try {
-    await auth.generatePasswordResetLink(email);
-    res.status(200).json({ success: true, message: 'Password reset email sent' });
+    // auth.generatePasswordResetLink() only *creates* a link — it never
+    // sends anything, so the old version reported success while no email
+    // ever went out. sendOobCode is the call that actually sends Firebase's
+    // built-in reset email.
+    const sendRes = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.FIREBASE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestType: 'PASSWORD_RESET', email }),
+      }
+    );
+
+    if (!sendRes.ok) {
+      const data = await sendRes.json().catch(() => ({}));
+      const code = data.error?.message || '';
+      // Unknown email: answer exactly like success, so this endpoint can't
+      // be used to find out which emails have accounts.
+      if (!code.startsWith('EMAIL_NOT_FOUND')) {
+        if (code.startsWith('TOO_MANY_ATTEMPTS_TRY_LATER')) {
+          return res.status(429).json({ error: 'Too many requests. Please wait a few minutes and try again.', code: 'too-many-attempts' });
+        }
+        console.error('Password reset error:', data);
+        return res.status(500).json({ error: 'Something went wrong on our end. Please try again.', code: 'server-error' });
+      }
+    }
+
+    res.status(200).json({ success: true, message: 'If an account exists for that email, a reset link is on its way.' });
   } catch (error) {
     console.error('Password reset error:', error);
-    res.status(500).json({ error: 'Failed to send reset email' });
+    res.status(500).json({ error: 'Something went wrong on our end. Please try again.', code: 'server-error' });
   }
 }
 

@@ -23,26 +23,35 @@
       </div>
       <p class="subtitle">Knowledge preserved through the noise</p>
       
-      <form id="authForm">
+      <form id="authForm" novalidate>
         <div id="authToggle">
           <button type="button" class="active" data-mode="signin">Sign In</button>
           <button type="button" data-mode="signup">Sign Up</button>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="emailGroup">
           <label for="email">Email</label>
-          <input type="email" id="email" required placeholder="Enter your email">
+          <input type="email" id="email" placeholder="Enter your email" autocomplete="email">
+          <div class="field-error" id="emailError"></div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="passwordGroup">
           <label for="password">Password</label>
-          <input type="password" id="password" required placeholder="Enter your password">
+          <div class="password-wrap">
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+            <button type="button" id="passwordToggle" aria-label="Show password">Show</button>
+          </div>
+          <div class="field-hint" id="capsLockHint" style="display:none;">Caps Lock is on</div>
+          <div class="field-error" id="passwordError"></div>
         </div>
         
         <div class="form-group" id="nameGroup" style="display:none;">
           <label for="displayName">Display Name</label>
-          <input type="text" id="displayName" placeholder="Your name">
+          <input type="text" id="displayName" placeholder="Your name" autocomplete="nickname">
+          <div class="field-error" id="displayNameError"></div>
         </div>
+        
+        <div class="auth-error" id="authError" role="alert" aria-live="polite" style="display:none;"></div>
         
         <button type="submit" id="authSubmit">Sign In</button>
         <div class="auth-links">

@@ -133,6 +133,94 @@ body {
 }
 
 /* =========================
+   AUTH FORM FEEDBACK
+========================= */
+
+.form-group.has-error input {
+  border-color: #b5564d;
+}
+
+.form-group.has-error input:focus {
+  border-color: #d9685f;
+}
+
+.field-error {
+  display: none;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #e8837a;
+}
+
+.form-group.has-error .field-error {
+  display: block;
+}
+
+.field-hint {
+  margin-top: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #d89b4a;
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  padding-right: 64px;
+}
+
+.password-wrap button {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #a6a399;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.password-wrap button:hover {
+  color: #e9e6de;
+}
+
+.auth-error {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: #2a1a19;
+  border: 1px solid #5a2f2b;
+  border-radius: 8px;
+  color: #e8837a;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.auth-info {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: #1c2b27;
+  border: 1px solid #2b4a40;
+  border-radius: 8px;
+  color: #3fa88c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.field-error:empty {
+  display: none !important; /* a highlighted field with no message shouldn't leave a blank gap */
+}
+
+.auth-links button.attention {
+  color: #d89b4a;
+  text-decoration: underline;
+}
+
+/* =========================
    APP
 ========================= */
 
