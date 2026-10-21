@@ -6,18 +6,18 @@
 function slidesPreview(slides) {
   return (slides || [])
     .slice(0, 3)
-    .map(s => `<li>${s.caption}</li>`)
+    .map(s => `<li>${escapeHtmlAttr(s.caption)}</li>`)
     .join('');
 }
 
 function draftCardHtml(draft) {
   const label = draft.sourceName
-    ? `DRAFT · ${draft.sourceName.toUpperCase()}`
+    ? `DRAFT · ${escapeHtmlAttr(draft.sourceName.toUpperCase())}`
     : 'DRAFT · AI-AUTHORED, NO SOURCE';
   return `
-    <div class="review-card" data-draft-id="${draft.id}">
+    <div class="review-card" data-draft-id="${escapeHtmlAttr(draft.id)}">
       <div class="meta"><span>${label}</span></div>
-      <p class="headline">${draft.headline}</p>
+      <p class="headline">${escapeHtmlAttr(draft.headline)}</p>
       <ul class="review-slides">${slidesPreview(draft.slides)}</ul>
       <div class="review-actions">
         <button type="button" class="review-approve-btn">Approve</button>

@@ -17,6 +17,10 @@ async function runSearch(query) {
     return;
   }
 
+  // Results render in the feed area, so make sure that's what's showing
+  if (typeof closeExplore === 'function') closeExplore();
+  if (typeof setBottomNavActive === 'function') setBottomNavActive('home');
+
   stopArticlesRealtime();
   container.innerHTML = '<div class="card"><div class="card-body"><p class="headline">Searching…</p></div></div>';
 

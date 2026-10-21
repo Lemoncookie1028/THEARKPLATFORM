@@ -11,9 +11,9 @@ const REASON_LABELS = {
 
 function moderationCardHtml(flag) {
   return `
-    <div class="moderation-card" data-flag-id="${flag.id}">
-      <p class="headline" style="font-size:14px;">${flag.postHeadline || '(post headline unavailable)'}</p>
-      <span class="moderation-reason">${REASON_LABELS[flag.reason] || flag.reason}</span>
+    <div class="moderation-card" data-flag-id="${escapeHtmlAttr(flag.id)}">
+      <p class="headline" style="font-size:14px;">${escapeHtmlAttr(flag.postHeadline || '(post headline unavailable)')}</p>
+      <span class="moderation-reason">${escapeHtmlAttr(REASON_LABELS[flag.reason] || flag.reason)}</span>
       <div class="moderation-actions">
         <button type="button" class="moderation-dismiss-btn">Dismiss</button>
         <button type="button" class="moderation-remove-btn">Remove post</button>

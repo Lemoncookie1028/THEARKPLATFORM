@@ -121,7 +121,7 @@ async function loadTopCreators() {
 
 function initials(name) {
   if (!name) return '--';
-  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+  return name.trim().split(/\s+/).slice(0, 2).map(w => (w[0] || '').toUpperCase()).join('') || '--';
 }
 
 async function openProfile(userId) {

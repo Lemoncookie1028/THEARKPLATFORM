@@ -24,10 +24,12 @@ function stampsFor(post) {
   if (post.flag) stamps.push(`<span class="stamp ${post.flag.level}">${post.flag.label}</span>`);
   if (post.verifierReviewed) stamps.push('<span class="stamp teal">verifier reviewed</span>');
   if (post.aiAssisted) stamps.push('<span class="stamp amber">AI-assisted, human-reviewed</span>');
+  // creatorName comes from a display name the user typed, so it must be
+  // escaped before going into innerHTML.
   if (post.creatorName && post.creatorId) {
-    stamps.push(`<span class="stamp creator-stamp" data-creator-id="${post.creatorId}">by ${post.creatorName}</span>`);
+    stamps.push(`<span class="stamp creator-stamp" data-creator-id="${escapeHtmlAttr(post.creatorId)}">by ${escapeHtmlAttr(post.creatorName)}</span>`);
   } else if (post.creatorName) {
-    stamps.push(`<span class="stamp">by ${post.creatorName}</span>`);
+    stamps.push(`<span class="stamp">by ${escapeHtmlAttr(post.creatorName)}</span>`);
   }
   return stamps.length ? `<div class="stamp-group">${stamps.join('')}</div>` : '';
 }
@@ -53,7 +55,7 @@ function renderPost(post) {
     return `
       <div class="meta"><span>CARD · ${(post.slides || []).length} SLIDES</span><span>${sourceLabel}</span></div>
       <p class="headline">${post.headline}</p>
-      ${firstSlide ? `<p class="content-preview">${truncateText(firstSlide.caption, 140)}</p>` : ''}
+      ${firstSlide ? `<p class="content-preview">${escapeHtmlAttr(truncateText(firstSlide.caption, 140))}</p>` : ''}
       ${stampsFor(post)}
     `;
   }
@@ -76,7 +78,7 @@ function renderPost(post) {
       <p class="headline">${post.headline}</p>
       <p class="content-preview">${post.snippet || ''}</p>
       ${post.sourceUrl ? `
-        <a class="news-link-out" href="${post.sourceUrl}" target="_blank" rel="noopener noreferrer">
+        <a class="news-link-out" href="${escapeHtmlAttr(safeUrl(post.sourceUrl))}" target="_blank" rel="noopener noreferrer">
           <span>Read on ${post.sourceName || 'source'}</span>
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -205,6 +207,9 @@ async function fetchFeed(topicKey) {
 }
 
 async function initFeed(topicKey = 'for-you') {
+  // Loading any feed means we want to see the feed, not the Explore page
+  if (typeof closeExplore === 'function') closeExplore();
+
   if (topicKey === 'articles') {
     initArticlesRealtime();
     return;
@@ -286,7 +291,7 @@ function openSourcePanel(post) {
     ? sources.map(s => `
         <div class="source-item">
           <span class="badge">SRC</span>
-          <a href="${s.url}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">${s.title || s.url}</a>
+          <a href="${escapeHtmlAttr(safeUrl(s.url))}" target="_blank" rel="noreferrer" style="color:inherit; text-decoration:none;">${escapeHtmlAttr(s.title || s.url || '')}</a>
         </div>
       `).join('')
     : `<div class="source-item"><span class="badge">—</span> No sources attached to this post yet.</div>`;
@@ -297,6 +302,15 @@ function openSourcePanel(post) {
 function closeSourcePanel() {
   const panel = document.getElementById('sourcePanel');
   if (panel) panel.classList.remove('open');
+}
+
+// Highlights one of the page icons (home / explore) in the bottom nav
+function setBottomNavActive(tab) {
+  const bar = document.querySelector('.bottom-bar');
+  if (!bar) return;
+  bar.querySelectorAll('svg').forEach((svg) => {
+    svg.classList.toggle('active', svg.dataset.tab === tab);
+  });
 }
 
 function setupFeedUI() {
@@ -319,18 +333,20 @@ function setupFeedUI() {
     bottomBar.addEventListener('click', (e) => {
       const icon = e.target.closest('[data-tab]');
       if (!icon) return;
-      bottomBar.querySelectorAll('svg').forEach(s => s.classList.remove('active'));
-      icon.classList.add('active');
-
       const tab = icon.dataset.tab;
+      // Home and Explore are pages, so the highlight follows them. Profile,
+      // Create and Settings slide over whichever page you're on, so they
+      // leave the highlight where it is.
+      if (tab === 'home' || tab === 'explore') setBottomNavActive(tab);
+
       if (tab === 'home') initFeed('for-you');
+      else if (tab === 'explore') openExplore();
       else if (tab === 'profile') {
         if (!currentUser) { showToast('Please sign in first'); return; }
         openProfile(currentUser.id);
       }
       else if (tab === 'create') openCreatePanel();
       else if (tab === 'settings') openSettingsPanel();
-      else showToast(`${tab[0].toUpperCase()}${tab.slice(1)} isn't built yet`);
     });
   }
 
@@ -342,6 +358,7 @@ function setupFeedUI() {
   setupSearchUI();
   setupSavesUI();
   setupCardViewerUI();
+  setupExploreUI();
   setupFeedWheelNav();
 }
 
