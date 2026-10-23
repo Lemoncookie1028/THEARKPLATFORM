@@ -32,4 +32,5 @@ function setupSettingsUI() {
   }
 
   setupReadAloudSettings();
+  setupScrollSoundSettings();
 }

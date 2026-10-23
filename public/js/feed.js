@@ -360,6 +360,7 @@ function setupFeedUI() {
   setupCardViewerUI();
   setupExploreUI();
   setupFeedWheelNav();
+  setupScrollSound();
 }
 
 // Desktop mouse-wheel / trackpad navigation for the snap-scroll feed.
